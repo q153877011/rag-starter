@@ -1,0 +1,40 @@
+因为  AI 响应需要时间， Tony 用  Git worktree 为每个任务创建独立工作目录，每个上面跑一个  Claude Code 实例，
+日常同时推进  3-5 个任务—— 给  A 下指令  → 切到  B 看结果  → 给  B 下指令  → 切到  C ，循环往复。这种 " 轮转式并
+行 " 是他利用  AI 等待时间的核心策略。
+"I have a Claude Code running on each work tree. I would rotate between them — do something here, tell it to
+do something next, switch to the next tab."
+「每个  worktree 上跑一个  Claude Code 。在它们之间轮转 —— 这边下指令，切到下一个看结果，再下指令。」
+阶段四： 30 Agent 并行  Code Review
+因为  AI 的  code review 具有很大的随机性 —— 同一段代码审查  5 次会得到  5 组不同的发现 ——Tony 的解法是以量取
+胜。他写了一个  Skill ，每次  code review 自动启动  30 个  AI agent 并行审查，分为三组，每组使用不同的视角和模
+型：
+"AI is kind of random. If you ask to review the code 5 times, it will come up with 5 different things."
+「 AI 有很大的随机性。你让它审查同一段代码  5 次，会得到  5 组不同的发现。」
+Agent 组 数量 模型 Prompt 策略
+组  1 ：标准审查10 个 Claude Code"Review this PR"
+组  2 ：独立第二意
+见 10 个 Codex "Review this PR" （不同模型提供多样性，避免  Claude 的系
+统性盲区）
+组  3 ：事故模拟10 个 Claude Code"This PR caused a big incident, root cause it"
+第三组的  prompt 通过改变角色框架 —— 从 " 帮我看看这代码 " 变成 " 这代码出了重大事故 "—— 让  AI 以事故调查员的心
+态审查代码，从而关注并发问题、边界条件、资源泄漏等在标准  review 中容易被忽略的维度。
+"The last 10 is Claude Code agents, but I don't tell them to review — I say 'this PR caused a big incident, and r
+oot cause it.' That's how I trick the AI into being more thorough."
+「最后  10 个  Claude Code 我不说  review—— 我说 ' 这个  PR 导致了重大事故，做  root cause' 。这样骗  AI 让它更
+仔细。」
+30 个  agent 完成审查后（约  45 分钟，期间会被  rate limit 限制需要重试），由一个主  Claude Code agent 汇总所有
+发现，按严重程度和发现频次（有多少个  agent 独立发现了同一个问题）排序。 Tony 再逐条人工判断每个发现是真
+实问题还是幻觉。他有时会故意在代码中保留一个已知的问题不告诉  AI ，观察  30 个  agent 能否发现 —— 如果发现
+了，说明这轮  review 质量够高；如果没发现，就再跑一轮。最终让  AI 自动将确认的评审意见发布到  PR 上。
+"The main Claude Code agent summarizes all findings, ranks them based on how severe things are and how
+many agents found it. The quality is very high, because the randomness evens out."
+「主  Claude Code agent 汇总所有发现，按严重程度和发现频次排序。质量非常高，因为随机性被平均掉
+了。」
+"Sometimes I find something wrong with the PR, but I'm not gonna tell the AI. I let it review. If it finds it, the revi
+ew is good. If it doesn't, I do another round."
+「有时我发现  PR 里有问题但不告诉  AI 。如果它找到了，说明  review 质量好。如果没找到，再来一轮。」
+每次  review 消耗约  $50 token，需要  45 分钟运行时间。这在个人项目中不可行，但在  Vercel 无限  token 的环境中成
+为可能。整个流程已封装为  Skill ，一个命令启动。
+"You can easily burn like $50 of tokens per review per PR. But for a company, they encourage it."
+「一次  PR review 很容易烧掉  $50 token 。但公司鼓励这么做。」
+四、工作节奏的变化：从深度专注到高频切换

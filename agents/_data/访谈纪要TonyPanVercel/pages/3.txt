@@ -1,0 +1,35 @@
+访谈纪要： Tony Pan — Vercel
+项目 信息
+受访者 Tony Pan （ Vercel Software Engineer ）
+人群分类 A2 — 大型企业资深工程师  / AI 重度用户。 15 年 + 经验，横跨  Google 、 Meta 、 xAI 、 Vercel 四家顶
+级科技公司，已完全不手写代码，用  AI 完成所有开发工作
+访谈日期 2026-04-07
+访谈人 陈诗园（ shiyuan ）
+录制链接 录制文件：
+访谈时长 约  55 分钟
+访谈语言 英文
+受访者背景
+15-16 年软件工程经验。工作经历： Meta （ 2015-2020 ，约 5 年） → Google （ 2020-2024 ，约 4 年）
+→ Meta （ 2024-2025 ，约半年） → xAI （ 2025.2-2025.3 ，约 1 个月） → Vercel （ 2025.4 至今）。 Ve
+rcel 是约  700 人的后期创业公司， Tony 任资深工程师（ fairly senior engineer ），负责构建高性能
+可扩展系统。每天使用  AI 工具， 6-12 个月经验。使用  Claude Code （主力）、 Codex 、 Cursor
+（轻量任务），公司提供无限  token ，个人不额外付费。
+一、当前角色与公司环境
+Tony 目前在  Vercel 担任资深工程师，负责构建高性能可扩展的内部系统（ proprietary systems ）。 Vercel 是一家约  7
+00 人的后期创业公司，以  Next.js 和前端部署平台闻名，客户群体主要是开发者。
+Vercel 对  AI 的态度在受访公司中最为激进—— 公司为所有员工提供无限  AI token （ Claude Code 、 Codex 、 Cursor
+全部免费），并且内部有一个  token 使用量排行榜，鼓励员工尽可能多地使用  AI 。 Tony 说自己甚至排不到前面，说
+明公司内存在大量比他更激进的  AI 使用者。这种 " 无上限鼓励 " 的环境，催生了很多在其他公司不可能出现的创新用法
+（如  30 agent 并行  code review ）。
+"My company has unlimited tokens. They actually look at a leaderboard of who uses the most tokens. And I'm
+not even on top of the list. People do lots of crazy things with it."
+「我们公司有无限  token 。公司有一个  token 使用量排行榜，我都排不到前面，有人用得比我还疯狂。」
+Tony 已经完全不手写代码，所有开发工作通过  AI 完成。他甚至用  Claude Code 来读  Slack 消息、写  Notion 文档、
+做项目规划， AI 已经成为他与所有工作工具之间的统一接口。
+"I haven't written any line of code for a long time now. Completely with using AI assistance."
+「我已经很久没写过一行代码了。完全用  AI 完成。」
+二、工具矩阵：三种工具的精准分工
+Tony 同时使用三种  AI coding 工具，但不是随意切换，而是形成了清晰的分层架构： Claude Code 负责所有核心开
+发， Codex 作为独立验证层确保质量， Cursor 只处理  Slack 上报来的轻量修复。这种分工背后的逻辑是 ——不信任
+任何单一模型的输出，用多模型交叉验证来对冲  AI 的随机性。
+https://meeting.tencent.com/crm/24DwBgog3d

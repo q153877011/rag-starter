@@ -1,0 +1,37 @@
+AI 时代对工程师角色的影响， Tony 给出了迄今受访者中最深刻的洞察：代码能力已经不再是区分工程师优劣的因
+素，因为  AI 让每个人都能写出差不多水平的代码。真正区分工程师的，变成了过去属于  PM 的能力 —— 发现问题、
+提出方案、推动跨团队协作、向上管理。这意味着工程师的绩效考核标准正在从 " 实现能力 " 转向 " 策略和影响力 " 。
+"The coding ability is no longer a distinguishing factor for engineers. What distinguishes you from your peers is
+your ability to come up with ideas, to drive the project direction — things like soft skills, PM skills. Cause every
+one can code now. There's no bad software engineers anymore."
+「代码能力不再是区分因素。区分你的是提出想法的能力、驱动项目方向的能力 —— 更像是  PM 技能。因为人人
+都能写代码了，没有差的工程师了。」
+Tony 坦言这对他个人也是挑战。作为一个  15 年经验的工程师，他习惯了被给一个困难的技术问题然后深入钻研。但
+现在 " 一个  prompt 就搞定了 " ，他不得不将精力转向观察用户行为、分析数据、和  PM 讨论方向 —— 这些过去不是他
+的核心工作。
+"I'm used to just being given a very difficult technical problem and diving into it. But now, it's just one prompt an
+d everything's figured out."
+「我习惯了被给一个很难的技术问题然后钻进去。但现在一个  prompt 就搞定了。」
+PM 也在变化 ——Vercel 的  PM 已经在用  Cursor 直接做小修改、提  PR ，只是还需要工程师  review 。 Tony 认为  PM
+直接写代码的趋势会继续深化，工程师和  PM 的边界正在模糊。
+六、 AI 时代的痛点与焦虑
+痛点一： AI 质量的不一致性
+Tony 最头痛的是  Claude Code 近期质量波动大，有时候很聪明，有时候很 " 笨 " ， one-shot 能力明显退步。这迫使他
+投入大量时间做人工审查，甚至要多次迭代才能得到可用的输出。 30 agent review 系统本身就是为了应对这个问题而
+生。
+"The biggest pain point is how to make sure the AI's quality is consistent. It's very frustrating sometimes, trying
+to guide it toward the right way."
+「最大痛点是如何确保  AI 质量一致。引导它走正确方向有时非常令人沮丧。」
+痛点二：并行过多导致人的认知过载
+为了利用  AI 等待时间， Tony 同时推进多个任务（ Git worktree 并行），但经常失控 —— 开了  10 个  tab 后完全记不清
+每个  tab 在做什么，甚至要问  AI " 我之前在做什么 " 。传统工程师被训练深度专注一个问题， AI 时代却要求高频上下文
+切换，这种转变让人更累而非更轻松。
+"I find myself with 10 different tabs, completely lose track of what I was trying to do. I go to a new tab and ask t
+he AI — 'what was I doing?'"
+「 10 个  tab ，完全记不清自己在干什么。切到新  tab 问  AI——' 我之前在做什么？ ' 」
+"That makes you a lot more tired. You feel like you've been in meetings all day with 100 people."
+「这让你更累。感觉像跟  100 个人开了一天不同的会。」
+痛点三： AI 产出速度超过人的处理能力 —— 人反而成了瓶颈
+Tony 总结的最大痛点不是某个具体的工具问题，而是人的精力和认知能力跟不上  AI 的产出速度。 AI 能做的越来越
+多、越来越快，但人需要审查、判断、决策，这些环节反而成了拖慢整体效率的瓶颈。他用了一个看似反直觉的说法
+——"humans are not the bottleneck"—— 实际表达的意思是：现在的瓶颈不在  AI 那边，而在人这边。
