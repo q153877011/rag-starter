@@ -1,38 +1,40 @@
 #!/usr/bin/env python3
 """
-prepare_rag_data.py — 扫描 ./files/ 目录，把 RAG 知识库写入项目的私有数据目录。
+prepare_rag_data.py — Scan the ./files/ directory and write RAG knowledge base
+data into the project's private data directory.
 
-直接运行（无需任何参数）：
+Run directly (no arguments needed):
   cd public/prepare-rag
   python3 prepare_rag_data.py
 
-输出目录布局（位于 <项目根>/agents/_data/）：
+Output directory layout (located at <project_root>/agents/_data/):
   agents/_data/
-  ├── index.json                       ← 全文档清单（替代 listDocuments）
+  ├── index.json                       ← Full document manifest (replaces listDocuments)
   └── {docId}/
-      ├── meta.json                    ← 文档元信息
-      ├── structure.json (可选)        ← PageIndex 树状索引
+      ├── meta.json                    ← Document metadata
+      ├── structure.json (optional)    ← PageIndex tree structure
       └── pages/
           ├── 1.txt
           ├── 2.txt
           └── ...
 
-目录约定（输入）：
+Input directory convention:
   public/prepare-rag/
   ├── files/
-  │   ├── 年报2025.pdf            ← 必须
-  │   ├── 年报2025.json           ← 可选，PageIndex 索引（与 PDF 同名）
+  │   ├── annual-report-2025.pdf   ← Required
+  │   ├── annual-report-2025.json  ← Optional, PageIndex (same name as PDF)
   │   └── ...
   ├── prepare_rag_data.py
   └── requirements.txt
 
-执行流程：
-  1. 扫描 ./files/*.pdf，每个 PDF 以文件名（不含扩展名）作为 doc_id
-  2. 若存在同名 .json，作为 PageIndex 树状索引一并输出
-  3. 清空 agents/_data/ 并全量重建
-  4. 生成 agents/_data/index.json 作为运行时清单
+Execution flow:
+  1. Scan ./files/*.pdf, use filename (without extension) as doc_id
+  2. If a same-name .json exists, include it as PageIndex tree structure
+  3. Clear agents/_data/ and rebuild from scratch
+  4. Generate agents/_data/index.json as the runtime manifest
 
-⚠️ 该目录不会被 express.static 暴露，只由服务端读取（见 agents/loader.js）。
+⚠️ This directory is NOT exposed via express.static; it's only read by the server
+   (see agents/loader.js).
 """
 
 import json
@@ -42,21 +44,21 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# ── 配置 ──────────────────────────────────────────────────────────────────────
+# ── Configuration ────────────────────────────────────────────────────────────
 
 FILES_DIR = Path(__file__).parent / "files"
 
-# 脚本路径：public/prepare-rag/prepare_rag_data.py
-# 数据目标：agents/_data/（即本文件往上 2 级到项目根，再进 agents/_data）
+# Script path: public/prepare-rag/prepare_rag_data.py
+# Data target: agents/_data/ (two levels up from this file to project root, then into agents/_data)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 AGENTS_DIR = PROJECT_ROOT / "agents"
 RAG_OUT_DIR = AGENTS_DIR / "_data"
 
 
-# ── PDF 文本提取 ───────────────────────────────────────────────────────────────
+# ── PDF Text Extraction ──────────────────────────────────────────────────────
 
 def load_pdf_reader():
-    """导入 pypdf 或 PyPDF2，两者都没有则报错退出"""
+    """Import pypdf or PyPDF2; exit with error if neither is available."""
     try:
         from pypdf import PdfReader
         return PdfReader
@@ -66,28 +68,28 @@ def load_pdf_reader():
         from PyPDF2 import PdfReader
         return PdfReader
     except ImportError:
-        print("❌ 缺少 PDF 依赖，请先运行: pip install -r requirements.txt", file=sys.stderr)
+        print("❌ Missing PDF dependency. Please run: pip install -r requirements.txt", file=sys.stderr)
         sys.exit(1)
 
 
 def extract_pages(pdf_path: Path, PdfReader) -> tuple[dict[int, str], int]:
-    """逐页提取 PDF 纯文本，返回 {页码: 文本} 和总页数"""
+    """Extract text from each PDF page. Returns {page_number: text} and total page count."""
     reader = PdfReader(str(pdf_path))
     pages: dict[int, str] = {}
     for i, page in enumerate(reader.pages):
         try:
             text = page.extract_text() or ""
         except Exception as e:
-            print(f"    ⚠️  第 {i + 1} 页提取失败: {e}", file=sys.stderr)
+            print(f"    ⚠️  Page {i + 1} extraction failed: {e}", file=sys.stderr)
             text = ""
         pages[i + 1] = text.strip()
     return pages, len(reader.pages)
 
 
-# ── doc_id 处理 ────────────────────────────────────────────────────────────────
+# ── doc_id Processing ────────────────────────────────────────────────────────
 
 def sanitize_doc_id(name: str) -> str:
-    """将文件名转换为合法的 doc_id（只保留字母数字下划线连字符）"""
+    """Convert filename to a valid doc_id (keep only alphanumerics, underscores, hyphens)."""
     s = name.strip()
     s = re.sub(r"[\s.]+", "_", s)
     s = re.sub(r"[^\w\-]", "", s)
@@ -95,39 +97,39 @@ def sanitize_doc_id(name: str) -> str:
     return s or "doc"
 
 
-# ── 写入单个文档 ────────────────────────────────────────────────────────────────
+# ── Write Single Document ────────────────────────────────────────────────────
 
 def write_document(
     pdf_path: Path,
     PdfReader,
     doc_id: str,
 ) -> dict:
-    """为单个 PDF 写入 meta.json / structure.json / pages/{n}.txt，返回 index.json 条目"""
+    """Write meta.json / structure.json / pages/{n}.txt for a single PDF. Returns index.json entry."""
     print(f"\n  📄 {pdf_path.name}  →  doc_id: {doc_id}")
 
-    # 1. 提取 PDF 文本
+    # 1. Extract PDF text
     pages, page_count = extract_pages(pdf_path, PdfReader)
     text_pages = sum(1 for t in pages.values() if t)
-    print(f"     共 {page_count} 页，有文字 {text_pages} 页")
+    print(f"     Total {page_count} pages, {text_pages} pages with text")
 
-    # 2. 尝试加载同名 PageIndex JSON 索引
+    # 2. Try loading same-name PageIndex JSON
     index_path = pdf_path.with_suffix(".json")
     index_data: dict = {}
     if index_path.exists():
         with open(index_path, "r", encoding="utf-8") as f:
             index_data = json.load(f)
-        print(f"     索引: {index_path.name}  根节点: «{index_data.get('title', '无标题')}»")
+        print(f"     Index: {index_path.name}  root: \u00ab{index_data.get('title', 'Untitled')}\u00bb")
     else:
-        print(f"     索引: 未找到 {index_path.name}，跳过 structure.json")
+        print(f"     Index: {index_path.name} not found, skipping structure.json")
 
     doc_name = index_data.get("title") or pdf_path.stem
 
-    # 3. 准备输出目录
+    # 3. Prepare output directory
     doc_dir = RAG_OUT_DIR / doc_id
     pages_dir = doc_dir / "pages"
     pages_dir.mkdir(parents=True, exist_ok=True)
 
-    # 4. 写 meta.json
+    # 4. Write meta.json
     meta_payload = {
         "doc_name":        doc_name,
         "doc_description": index_data.get("summary", ""),
@@ -141,7 +143,7 @@ def write_document(
     meta_path.write_text(meta_text, encoding="utf-8")
     meta_bytes = len(meta_text.encode("utf-8"))
 
-    # 5. 写 structure.json（可选）
+    # 5. Write structure.json (optional)
     structure_bytes = 0
     has_structure = bool(index_data)
     if has_structure:
@@ -149,7 +151,7 @@ def write_document(
         (doc_dir / "structure.json").write_text(structure_text, encoding="utf-8")
         structure_bytes = len(structure_text.encode("utf-8"))
 
-    # 6. 逐页原文（跳过空页）
+    # 6. Write page text (skip empty pages)
     page_bytes = 0
     written_pages = 0
     skipped = 0
@@ -163,11 +165,11 @@ def write_document(
         written_pages += 1
 
     if skipped:
-        print(f"     跳过 {skipped} 个空页（纯图片页）")
+        print(f"     Skipped {skipped} empty pages (image-only pages)")
 
     total_bytes = meta_bytes + structure_bytes + page_bytes
     print(
-        f"     写入文件: 1 meta + {'1' if has_structure else '0'} structure + "
+        f"     Written: 1 meta + {'1' if has_structure else '0'} structure + "
         f"{written_pages} pages  ({total_bytes / 1024:.1f} KB)"
     )
 
@@ -183,41 +185,41 @@ def write_document(
     }
 
 
-# ── 主流程 ─────────────────────────────────────────────────────────────────────
+# ── Main ─────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     print("=" * 60)
-    print("  RAG 数据生成工具  —  PageIndex")
+    print("  RAG Data Generator  —  PageIndex")
     print("=" * 60)
 
-    # 检查 files 目录
+    # Check files directory
     if not FILES_DIR.exists():
-        print(f"❌ 目录不存在: {FILES_DIR}", file=sys.stderr)
+        print(f"❌ Directory does not exist: {FILES_DIR}", file=sys.stderr)
         sys.exit(1)
 
     pdf_files = sorted(FILES_DIR.glob("*.pdf"))
     if not pdf_files:
-        print(f"⚠️  {FILES_DIR} 目录下没有找到任何 PDF 文件")
+        print(f"⚠️  No PDF files found in {FILES_DIR}")
         sys.exit(0)
 
-    print(f"\n📁 扫描目录: {FILES_DIR}")
-    print(f"   发现 {len(pdf_files)} 个 PDF 文件:")
+    print(f"\n📁 Scanning directory: {FILES_DIR}")
+    print(f"   Found {len(pdf_files)} PDF file(s):")
     for p in pdf_files:
         has_index = p.with_suffix(".json").exists()
         marker = "  ✦" if has_index else "  ·"
-        print(f"{marker} {p.name}" + (" [含索引]" if has_index else ""))
+        print(f"{marker} {p.name}" + (" [has index]" if has_index else ""))
 
-    # 清空并重建输出目录
+    # Clear and rebuild output directory
     if RAG_OUT_DIR.exists():
-        print(f"\n🗑️  清空旧目录: {RAG_OUT_DIR}")
+        print(f"\n🗑️  Clearing old directory: {RAG_OUT_DIR}")
         shutil.rmtree(RAG_OUT_DIR)
     RAG_OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 加载 PDF 解析库
+    # Load PDF parsing library
     PdfReader = load_pdf_reader()
 
-    # 逐个写入
-    print("\n── 写入文档内容 " + "─" * 40)
+    # Process each document
+    print("\n── Writing document content " + "─" * 33)
     index_entries: list[dict] = []
     used_ids: list[str] = []
 
@@ -230,10 +232,10 @@ def main() -> None:
         entry = write_document(pdf_path, PdfReader, doc_id)
         index_entries.append(entry)
 
-    # 汇总统计
+    # Summary statistics
     total_bytes = sum(e["totalBytes"] for e in index_entries)
 
-    # 写 index.json
+    # Write index.json
     index_payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "documents":    index_entries,
@@ -244,14 +246,14 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    print(f"\n── 汇总 " + "─" * 48)
-    print(f"   文档数:     {len(pdf_files)}")
-    print(f"   总数据量:   {total_bytes / 1024:.1f} KB  ({total_bytes / 1024 / 1024:.2f} MB)")
-    print(f"   输出目录:   {RAG_OUT_DIR.relative_to(PROJECT_ROOT)}")
-    print(f"   清单文件:   {index_path.relative_to(PROJECT_ROOT)}")
+    print(f"\n── Summary " + "─" * 48)
+    print(f"   Documents:    {len(pdf_files)}")
+    print(f"   Total size:   {total_bytes / 1024:.1f} KB  ({total_bytes / 1024 / 1024:.2f} MB)")
+    print(f"   Output dir:   {RAG_OUT_DIR.relative_to(PROJECT_ROOT)}")
+    print(f"   Manifest:     {index_path.relative_to(PROJECT_ROOT)}")
 
     print("\n" + "=" * 60)
-    print("  ✅ RAG 数据生成完成！")
+    print("  ✅ RAG data generation complete!")
     print("=" * 60)
     for doc_id in used_ids:
         print(f"   doc_id: {doc_id}")

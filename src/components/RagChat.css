@@ -346,6 +346,35 @@
   cursor: not-allowed;
 }
 
+.chat-clear-circle-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.chat-clear-circle-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.chat-clear-circle-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.chat-clear-circle-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ── Mobile ────────────────────────────── */
 @media (max-width: 640px) {
   .rag-chat {
