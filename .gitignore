@@ -50,3 +50,6 @@ __pycache__/
 .eslintcache
 coverage/
 .nyc_output/
+
+# AI assistant local instructions
+CLAUDE.md
