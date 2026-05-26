@@ -24,7 +24,7 @@ _base_url = os.getenv("AI_GATEWAY_BASE_URL", "")
 _model_name = os.getenv("AI_GATEWAY_MODEL", "@Pages/hy3-preview")
 
 if not _api_key or not _base_url:
-    logger.error("AI_GATEWAY_API_KEY / AI_GATEWAY_BASE_URL / AI_GATEWAY_MODEL not set")
+    logger.error("AI_GATEWAY_API_KEY / AI_GATEWAY_BASE_URL not set")
 
 logger.log(f"Initializing model: {_model_name} @ {_base_url}")
 
