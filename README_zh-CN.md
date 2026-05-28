@@ -1,6 +1,6 @@
 # RAG Agent
 
-基于 **React + Vite**（前端）和 **OpenAI Agents SDK**（Python 后端）构建的企业级 RAG（检索增强生成）智能体，部署在 **EdgeOne Pages** 上。系统将 PDF 文档处理为本地知识库，并提供带引用溯源的聊天问答界面。
+基于 **React + Vite**（前端）和 **OpenAI Agents SDK**（Python 后端）构建的企业级 RAG（检索增强生成）智能体，部署在 **EdgeOne Makers** 上。系统将 PDF 文档处理为本地知识库，并提供带引用溯源的聊天问答界面。
 
 ## 功能特性
 
@@ -20,7 +20,7 @@
 └────────────────────┬────────────────────────────────┘
                      │ SSE / JSON
 ┌────────────────────▼────────────────────────────────┐
-│  后端 (EdgeOne Pages Functions — Python)             │
+│  后端 (EdgeOne Makers — Python)             │
 │  agents/chat/index.py        → POST /chat           │
 │  agents/stop/index.py        → POST /stop           │
 │  agents/history/index.py     → POST /history        │
@@ -84,7 +84,7 @@ npm run prepare-rag
 ### 4. 启动开发服务器
 
 ```bash
-edgeone pages dev
+edgeone makers dev
 ```
 
 ## RAG 数据流水线
@@ -143,7 +143,7 @@ rag-agent/
 │       ├── RagChat.tsx           # 聊天 UI（流式渲染）
 │       ├── CitationCard.tsx      # 引用来源展示
 │       └── KnowledgeBaseSummary.tsx
-├── agents/                       # 后端 (EdgeOne Pages Functions)
+├── agents/                       # 后端 (EdgeOne Makers)
 │   ├── _agent.py                 # Agent 定义
 │   ├── _tools.py                 # RAG 工具（搜索、获取页面）
 │   ├── _loader.py                # 文档数据读取器
@@ -166,10 +166,10 @@ rag-agent/
 
 ## 部署
 
-部署到 EdgeOne Pages：
+部署到 EdgeOne Makers：
 
 ```bash
-edgeone pages build
+edgeone makers build
 ```
 
 `edgeone.json` 配置了 `openai-agents` 框架和 900 秒的 Agent 执行超时。

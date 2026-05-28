@@ -1,6 +1,6 @@
 # RAG Agent
 
-An enterprise RAG (Retrieval-Augmented Generation) agent built with **React + Vite** (frontend) and **OpenAI Agents SDK** (Python backend) on **EdgeOne Pages**. The system processes PDF documents into a local knowledge base and provides a chat interface with citation-backed answers.
+An enterprise RAG (Retrieval-Augmented Generation) agent built with **React + Vite** (frontend) and **OpenAI Agents SDK** (Python backend) on **EdgeOne Makers**. The system processes PDF documents into a local knowledge base and provides a chat interface with citation-backed answers.
 
 ## Features
 
@@ -20,7 +20,7 @@ An enterprise RAG (Retrieval-Augmented Generation) agent built with **React + Vi
 └────────────────────┬────────────────────────────────┘
                      │ SSE / JSON
 ┌────────────────────▼────────────────────────────────┐
-│  Backend (EdgeOne Pages Functions — Python)          │
+│  Backend (EdgeOne Makers — Python)          │
 │  agents/chat/index.py        → POST /chat           │
 │  agents/stop/index.py        → POST /stop           │
 │  agents/history/index.py     → POST /history        │
@@ -84,7 +84,7 @@ This extracts text from PDFs and writes structured data to `agents/_data/`.
 ### 4. Run Development Servers
 
 ```bash
-edgeone pages dev
+edgeone makers dev
 ```
 
 ## RAG Data Pipeline
@@ -143,7 +143,7 @@ rag-agent/
 │       ├── RagChat.tsx           # Chat UI with streaming
 │       ├── CitationCard.tsx      # Source citation display
 │       └── KnowledgeBaseSummary.tsx
-├── agents/                       # Backend (EdgeOne Pages Functions)
+├── agents/                       # Backend (EdgeOne Makers)
 │   ├── _agent.py                 # Agent definition
 │   ├── _tools.py                 # RAG tools (search, fetch)
 │   ├── _loader.py                # Document data reader
@@ -166,10 +166,10 @@ rag-agent/
 
 ## Deployment
 
-Deploy to EdgeOne Pages:
+Deploy to EdgeOne Makers:
 
 ```bash
-edgeone pages build
+edgeone makers build
 ```
 
 The `edgeone.json` configures the deployment with `openai-agents` framework and 900s timeout for agent execution.
