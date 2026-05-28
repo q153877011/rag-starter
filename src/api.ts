@@ -109,7 +109,7 @@ export function sendMessageStream(
         "Content-Type": "application/json",
       };
       if (conversationId) {
-        headers["pages-agent-conversation-id"] = conversationId;
+        headers["makers-conversation-id"] = conversationId;
       }
 
       const res = await fetch(endpoint, {
