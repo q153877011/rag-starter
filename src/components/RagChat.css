@@ -121,6 +121,7 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
+  min-width: 0;
 }
 
 .preset-chips--inline {
@@ -133,12 +134,16 @@
   font-family: var(--font-body);
   font-size: 0.82rem;
   padding: 8px 14px;
+  max-width: 100%;
+  min-width: 0;
   border-radius: 20px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   transition: all var(--transition);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .preset-chip:hover:not(:disabled) {
